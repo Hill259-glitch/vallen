@@ -4,29 +4,58 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vallen's Valentine's Surprise 💖</title>
+
 <style>
-    body {
+    html, body {
         margin: 0;
         padding: 0;
         font-family: 'Arial', sans-serif;
         overflow-x: hidden;
-        min-height: 200vh; /* makes page scrollable */
+        min-height: 100vh;
+        scroll-behavior: smooth;
+    }
+
+    body {
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
         align-items: center;
         text-align: center;
-        background: url('images/background.jpg') no-repeat center center fixed;
+        opacity: 0;
+        animation: fadeIn 2s ease forwards;
+
+        background: url('images/background.jpg') center center no-repeat;
         background-size: cover;
+        background-attachment: fixed;
+        position: relative;
+    }
+
+    /* Romantic pink overlay */
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 105, 180, 0.25);
+        backdrop-filter: blur(2px);
+        z-index: 0;
+    }
+
+    @keyframes fadeIn {
+        to { opacity: 1; }
     }
 
     h1 {
         color: #fff;
-        margin-top: 50px;
+        margin-top: 60px;
         margin-bottom: 30px;
         z-index: 2;
         position: relative;
-        text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        text-shadow: 2px 2px 12px rgba(0,0,0,0.8);
+        animation: floatTitle 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatTitle {
+        from { transform: translateY(0px); }
+        to { transform: translateY(-10px); }
     }
 
     button {
@@ -36,10 +65,17 @@
         border-radius: 12px;
         cursor: pointer;
         background: #fff;
-        color: #ff6f91;
-        transition: transform 0.2s, background 0.2s;
+        color: #ff4f81;
+        transition: all 0.3s ease;
         z-index: 2;
         position: relative;
+        box-shadow: 0 0 15px rgba(255, 79, 129, 0.6);
+        animation: glow 2s infinite alternate;
+    }
+
+    @keyframes glow {
+        from { box-shadow: 0 0 10px rgba(255, 79, 129, 0.6); }
+        to { box-shadow: 0 0 25px rgba(255, 79, 129, 1); }
     }
 
     button:hover {
@@ -52,22 +88,22 @@
         flex-direction: column;
         gap: 20px;
         margin-top: 20px;
+        margin-bottom: 100px;
         z-index: 2;
         position: relative;
     }
 
     .surprise img {
-        max-width: 60%; 
+        max-width: 90%;
         height: auto;
         border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         opacity: 0;
         transition: opacity 1s ease-in-out, transform 0.5s ease;
     }
 
     audio {
-        outline: none;
-        margin-top: 20px;
+        display: none;
     }
 
     /* Falling flowers */
@@ -81,6 +117,7 @@
         opacity: 0.8;
         animation: fall linear infinite;
         pointer-events: none;
+        z-index: 1;
     }
 
     @keyframes fall {
@@ -88,19 +125,24 @@
         100% { transform: translateY(110vh) rotate(360deg); opacity: 0.2; }
     }
 
-    /* Hearts floating up */
     .heart {
         position: fixed;
         width: 20px;
         height: 20px;
-        background-image: url('https://i.ibb.co/QMJv9Bh/heart.png'); /* transparent heart PNG */
+        background-image: url('https://i.ibb.co/QMJv9Bh/heart.png');
         background-size: cover;
         opacity: 0.8;
         pointer-events: none;
+        z-index: 1;
     }
 
+    @media (max-width: 768px) {
+        h1 { font-size: 1.6rem; padding: 0 15px; }
+        button { font-size: 1rem; padding: 12px 25px; }
+    }
 </style>
 </head>
+
 <body>
 <h1>Happy Valentine's Day, Vallen! 💖</h1>
 <button id="surpriseBtn">Click for Surprise!</button>
@@ -108,9 +150,8 @@
 <div class="surprise" id="surpriseContent">
     <img src="images/image1.jpg" alt="Image 1">
     <img src="images/image2.jpg" alt="Image 2">
-    <audio controls autoplay>
+    <audio id="music">
         <source src="oursong.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
     </audio>
     <p style="color:#fff; font-size:1.2rem;">Love you forever 💕</p>
 </div>
@@ -119,19 +160,19 @@
     const btn = document.getElementById('surpriseBtn');
     const surprise = document.getElementById('surpriseContent');
     const images = surprise.querySelectorAll('img');
+    const music = document.getElementById('music');
 
-    // Show surprise with fade-in
     btn.addEventListener('click', () => {
         surprise.style.display = 'flex';
         btn.style.display = 'none';
+        music.play();
+
         images.forEach((img, index) => {
-            setTimeout(() => { img.style.opacity = 1; }, index * 500);
+            setTimeout(() => { img.style.opacity = 1; }, index * 600);
         });
     });
 
-    // Create falling flowers
     const numberOfFlowers = 30;
-    const flowers = [];
     for(let i=0; i<numberOfFlowers; i++){
         const flower = document.createElement('div');
         flower.classList.add('flower');
@@ -141,42 +182,8 @@
         flower.style.height = flower.style.width;
         flower.style.opacity = 0.5 + Math.random() * 0.5;
         document.body.appendChild(flower);
-        flowers.push(flower);
     }
-
-    // Create hearts array
-    const hearts = [];
-    const numberOfHearts = 20;
-    for(let i=0; i<numberOfHearts; i++){
-        const heart = document.createElement('div');
-        heart.classList.add('heart');
-        heart.style.left = Math.random() * 100 + 'vw';
-        heart.style.top = 100 + Math.random() * window.innerHeight + 'px';
-        heart.style.width = (15 + Math.random() * 20) + 'px';
-        heart.style.height = heart.style.width;
-        document.body.appendChild(heart);
-        hearts.push(heart);
-    }
-
-    // Scroll event for parallax
-    window.addEventListener('scroll', () => {
-        const scrollY = window.scrollY;
-
-        // Move flowers
-        flowers.forEach((flower, index) => {
-            flower.style.transform = `translateY(${scrollY * 0.2 * (index % 5 + 1)}px) rotate(${scrollY}deg)`;
-        });
-
-        // Move hearts upward slowly as scroll
-        hearts.forEach((heart, index) => {
-            heart.style.top = 100 + Math.random() * window.innerHeight - scrollY * 0.3 + 'px';
-        });
-
-        // Slight parallax for images
-        images.forEach((img, index) => {
-            img.style.transform = `translateY(${scrollY * 0.1 * (index+1)}px)`;
-        });
-    });
 </script>
+
 </body>
 </html>
